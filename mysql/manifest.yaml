@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: expense
+  labels:
+    project: expense
+    environment: dev
+    created_by: HemanthKumar
+    module: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      project: expense
+      environment: dev
+      created_by: HemanthKumar
+      module: db
+  template:
+    metadata:
+      labels:
+        project: expense
+        environment: dev
+        created_by: HemanthKumar
+        module: db
+    spec:
+      containers:
+        - name: mysql
+          image: hemanthkumar75/mysql:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3306
+          readinessProbe:
+            tcpSocket:
+              port: 3306
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            tcpScoket: 
+              port: 3306
+            initialDelaySeconds: 10
+            periodSeconds: 10
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql
+  namespace: expense
+spec:
+  selector:
+    project: expense
+    environment: dev
+    created_by: HemanthKumar
+    module: db
+  type: ClusterIP
+  ports:
+    - name: mysql
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
